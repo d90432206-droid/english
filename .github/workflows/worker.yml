@@ -1,0 +1,32 @@
+name: English Learning Worker
+
+on:
+  schedule:
+    # Run every 15 minutes
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # Allow manual trigger button
+
+jobs:
+  process-videos:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas yt-dlp google-genai youtube-transcript-api supabase python-dotenv
+        
+    - name: Run Worker (Batch Mode)
+      env:
+        GOOGLE_API_KEYS: ${{ secrets.GOOGLE_API_KEYS }}
+        SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+        SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      run: |
+        python worker.py --batch

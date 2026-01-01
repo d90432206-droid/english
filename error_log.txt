@@ -1,0 +1,6 @@
+{'message': 'new row violates row-level security policy for table "english_videos"', 'code': '42501', 'hint': None, 'details': None}Traceback (most recent call last):
+  File "E:\¤å¥ó\english\force_process_video.py", line 25, in run_force_update
+    response = supabase.table(TABLE_NAME).upsert(analysis).execute()
+  File "C:\Users\d9043\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\postgrest\_sync\request_builder.py", line 53, in execute
+    raise APIError(dict(json_obj))
+postgrest.exceptions.APIError: {'message': 'new row violates row-level security policy for table "english_videos"', 'code': '42501', 'hint': None, 'details': None}
