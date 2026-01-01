@@ -57,11 +57,11 @@ const AddVideoModal = ({ isOpen, onClose, onVideoAdded }) => {
             quotaData.count = 0
         }
 
-        if (quotaData.count >= 5) {
-            setError('系統資源已耗盡 (Quota Exceeded)。請等待明日額度重置。')
+        if (quotaData.count >= 50) { // TEMPORARY UNLOCK: Increased to 50
+            alert('即便學習熱情高漲，也請適度休息。\n系統資源已耗盡，請明日再試 (API Usage Limit Reached)。')
+            setLoading(false) // Ensure loading is turned off
             return
         }
-
         setLoading(true)
         setError(null)
 
