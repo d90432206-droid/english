@@ -175,41 +175,39 @@ def fetch_transcript_final(video_id):
     """
     # 1. Try youtube_transcript_api
     try:
-        print("   [嘗試] 使用 youtube_transcript_api...")
-        # Fix: YTA usage
-        from youtube_transcript_api import YouTubeTranscriptApi
+        print("   [嘗試] 使用 youtube_transcript_api (Explicit Import)...")
+        import youtube_transcript_api
+        YTA_Class = youtube_transcript_api.YouTubeTranscriptApi
         
-        try:
-            # Method A: list_transcripts (Newer API, supports auto-generated)
-            try:
-                transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
-                try:
-                    transcript = transcript_list.find_transcript(['en', 'en-US', 'en-GB'])
-                except:
-                    # If specific english not found, get generated or any
-                    try:
-                        transcript = transcript_list.find_generated_transcript(['en'])
-                    except:
-                        transcript = next(iter(transcript_list))
-                
-                raw_data = transcript.fetch()
-                
-            except AttributeError:
-                # Method B: Old API fallback
-                print("    -> 'list_transcripts' not found, using 'get_transcript'...")
-                raw_data = YouTubeTranscriptApi.get_transcript(video_id, languages=['en', 'en-US'])
+        # DEBUG: Check what's inside
+        print(f"   [DEBUG] YTA Dir: {dir(YTA_Class)[:20]}")
 
-            full_text = ""
-            for p in raw_data:
-                start_time = int(p['start'])
-                text = p['text'].replace('\n', ' ')
-                full_text += f"{start_time}|{text}\n"
-            
-            print(f"   [成功] YTA 抓取完成 ({len(full_text)} chars)")
-            return full_text
-        except Exception as inner_e:
-            print(f"    -> YTA inner error: {inner_e}")
-            raise inner_e
+        raw_data = None
+        
+        # Method A: list_transcripts
+        try:
+            transcript_list = YTA_Class.list_transcripts(video_id)
+            try:
+                transcript = transcript_list.find_transcript(['en', 'en-US', 'en-GB'])
+            except:
+                try:
+                    transcript = transcript_list.find_generated_transcript(['en'])
+                except:
+                    transcript = next(iter(transcript_list))
+            raw_data = transcript.fetch()
+        except Exception as e_list:
+             print(f"    -> list_transcripts failed: {e_list}. Trying get_transcript...")
+             # Method B: get_transcript
+             raw_data = YTA_Class.get_transcript(video_id, languages=['en', 'en-US', 'en-GB'])
+
+        full_text = ""
+        for p in raw_data:
+            start_time = int(p['start'])
+            text = p['text'].replace('\n', ' ')
+            full_text += f"{start_time}|{text}\n"
+        
+        print(f"   [成功] YTA 抓取完成 ({len(full_text)} chars)")
+        return full_text
 
     except Exception as e:
         print(f"   [失敗] YTA 失敗: {str(e)[:100]}... 改用 yt-dlp")
