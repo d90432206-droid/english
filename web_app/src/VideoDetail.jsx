@@ -148,7 +148,7 @@ const VideoDetail = () => {
     )
 
     return (
-        <div className="min-h-screen bg-[#f3f1e9] text-slate-800 p-4 md:p-8 font-sans">
+        <div className="min-h-screen bg-[#f3f1e9] text-slate-800 p-4 md:p-8 font-sans overflow-x-hidden">
             {/* Navigation */}
             <Link to="/" className="inline-flex items-center text-slate-500 hover:text-amber-700 mb-6 transition-colors font-bold uppercase tracking-wide text-xs">
                 <ArrowLeft className="w-4 h-4 mr-2" /> Back to Library
@@ -200,8 +200,8 @@ const VideoDetail = () => {
                     </div>
                 </div>
 
-                {/* Right Column: Scrollable Learning Materials */}
-                <div className="lg:col-span-5 space-y-6 h-[calc(100vh-140px)] overflow-y-auto pr-2 custom-scrollbar lg:sticky lg:top-8">
+                {/* Right Column: Learning Materials */}
+                <div className="lg:col-span-5 space-y-6 lg:h-[calc(100vh-140px)] lg:overflow-y-auto pr-0 md:pr-2 custom-scrollbar lg:sticky lg:top-8 pb-10">
 
                     {/* Tabs */}
                     <div className="flex p-1 bg-[#e7e4d8] rounded-none border border-[#d4d1c0]">

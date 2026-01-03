@@ -175,42 +175,58 @@ def fetch_transcript_final(video_id):
     """
     # 1. Try youtube_transcript_api
     try:
-        print("   [嘗試] 使用 youtube_transcript_api (Explicit Import)...")
+        print("   [嘗試] 使用 youtube_transcript_api (Deep Debug)...")
         import youtube_transcript_api
-        YTA_Class = youtube_transcript_api.YouTubeTranscriptApi
+        print(f"   [DEBUG] YTA Module File: {getattr(youtube_transcript_api, '__file__', 'Unknown')}")
         
-        # DEBUG: Check what's inside
-        print(f"   [DEBUG] YTA Dir: {dir(YTA_Class)[:20]}")
+        # Access the class carefully
+        YTA_Class = getattr(youtube_transcript_api, 'YouTubeTranscriptApi', None)
+        if not YTA_Class:
+            print("   [DEBUG] YouTubeTranscriptApi class not found in module!")
+            # Fallback level 2: try direct import
+            from youtube_transcript_api import YouTubeTranscriptApi as YTA_Class
+        
+        print(f"   [DEBUG] YTA Class: {YTA_Class}")
+        print(f"   [DEBUG] YTA Methods: {[m for m in dir(YTA_Class) if not m.startswith('_')]}")
 
         raw_data = None
         
-        # Method A: list_transcripts
+        # Strategy A: list_transcripts
         try:
-            transcript_list = YTA_Class.list_transcripts(video_id)
-            try:
-                transcript = transcript_list.find_transcript(['en', 'en-US', 'en-GB'])
-            except:
+            if hasattr(YTA_Class, 'list_transcripts'):
+                transcript_list = YTA_Class.list_transcripts(video_id)
                 try:
-                    transcript = transcript_list.find_generated_transcript(['en'])
+                    transcript = transcript_list.find_transcript(['en', 'en-US', 'en-GB'])
                 except:
-                    transcript = next(iter(transcript_list))
-            raw_data = transcript.fetch()
+                    try:
+                        transcript = transcript_list.find_generated_transcript(['en'])
+                    except:
+                        transcript = next(iter(transcript_list))
+                raw_data = transcript.fetch()
+            else:
+                raise AttributeError("Method 'list_transcripts' missing")
         except Exception as e_list:
-             print(f"    -> list_transcripts failed: {e_list}. Trying get_transcript...")
-             # Method B: get_transcript
-             raw_data = YTA_Class.get_transcript(video_id, languages=['en', 'en-US', 'en-GB'])
+             print(f"    -> list_transcripts failed: {str(e_list)[:100]}")
+             # Strategy B: get_transcript
+             if hasattr(YTA_Class, 'get_transcript'):
+                 print("    -> Trying get_transcript...")
+                 raw_data = YTA_Class.get_transcript(video_id, languages=['en', 'en-US', 'en-GB'])
+             else:
+                 print("    -> get_transcript also missing!")
+                 raise Exception("No usable methods found in YTA Class")
 
-        full_text = ""
-        for p in raw_data:
-            start_time = int(p['start'])
-            text = p['text'].replace('\n', ' ')
-            full_text += f"{start_time}|{text}\n"
-        
-        print(f"   [成功] YTA 抓取完成 ({len(full_text)} chars)")
-        return full_text
+        if raw_data:
+            full_text = ""
+            for p in raw_data:
+                start_time = int(p['start'])
+                text = p['text'].replace('\n', ' ')
+                full_text += f"{start_time}|{text}\n"
+            
+            print(f"   [成功] YTA 抓取完成 ({len(full_text)} chars)")
+            return full_text
 
     except Exception as e:
-        print(f"   [失敗] YTA 失敗: {str(e)[:100]}... 改用 yt-dlp")
+        print(f"   [失敗] YTA 失敗: {str(e)[:150]}... 改用 yt-dlp")
         
     # 2. Fallback to yt-dlp
     try:

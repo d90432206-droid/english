@@ -207,7 +207,7 @@ const LearningMomentum = ({ streak, goalMet, stats }) => {
 const StatBox = ({ label, value, subtext, color = "amber", icon: Icon }) => (
     <motion.div
         whileHover={{ y: -5, transition: { duration: 0.2 } }}
-        className={`bg-white border-2 border-slate-800 p-4 flex flex-col items-start min-w-[180px] shadow-[4px_4px_0px_0px_#e7e4d8] relative overflow-hidden group hover:shadow-[4px_4px_0px_0px_#d97706] transition-all`}
+        className={`bg-white border-2 border-slate-800 p-3 md:p-4 flex flex-col items-start min-w-[140px] md:min-w-[180px] shadow-[4px_4px_0px_0px_#e7e4d8] relative overflow-hidden group hover:shadow-[4px_4px_0px_0px_#d97706] transition-all`}
     >
         <div className="flex justify-between items-start w-full mb-1">
             <span className="text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase italic leading-none">{label}</span>
@@ -215,7 +215,7 @@ const StatBox = ({ label, value, subtext, color = "amber", icon: Icon }) => (
         </div>
 
         <div className="flex items-baseline gap-1">
-            <span className="text-4xl font-black text-slate-800 tracking-tighter tabular-nums leading-none">{value}</span>
+            <span className="text-2xl md:text-4xl font-black text-slate-800 tracking-tighter tabular-nums leading-none">{value}</span>
             {subtext && <span className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter ml-1">項目</span>}
         </div>
         {subtext && (
@@ -430,23 +430,25 @@ const VideoList = () => {
     )
 
     return (
-        <div className="p-8 max-w-7xl mx-auto font-sans text-slate-800">
+        <div className="p-4 md:p-8 max-w-7xl mx-auto font-sans text-slate-800">
             {/* Header / Nav */}
             <motion.div
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-8 border-b-2 border-[#e7e4d8] pb-6"
             >
-                <div className="flex items-center gap-10">
+                <div className="flex items-center gap-4 md:gap-10">
                     <motion.div
                         whileHover={{ scale: 1.05 }}
-                        className="w-24 h-24 bg-white shadow-[8px_8px_0px_0px_#e7e4d8] border-2 border-slate-800 p-2 flex items-center justify-center shrink-0"
+                        className="w-16 h-16 md:w-24 md:h-24 bg-white shadow-[4px_4px_0px_0px_#e7e4d8] md:shadow-[8px_8px_0px_0px_#e7e4d8] border-2 border-slate-800 p-2 flex items-center justify-center shrink-0"
                     >
                         <img src="/logo.svg" alt="VocaTube Logo" className="w-full h-full object-contain" />
                     </motion.div>
 
                     <div className="flex flex-col">
-                        <PuzzleLogo />
+                        <div className="scale-75 md:scale-100 origin-left">
+                            <PuzzleLogo />
+                        </div>
                         <div className="flex items-center gap-3 mt-3">
                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-2 border-slate-800 px-2 py-0.5 bg-white shadow-[2px_2px_0px_0px_#e7e4d8]">
                                 V1.2.0_STABLE
@@ -465,10 +467,10 @@ const VideoList = () => {
                         </div>
                     </div>
 
-                    <Link to="/library" className="group/lib ml-4">
+                    <Link to="/library" className="group/lib ml-0 md:ml-4 w-full md:w-auto">
                         <motion.div
                             whileHover={{ x: 5 }}
-                            className="relative bg-white border-2 border-slate-800 p-4 pr-12 flex items-center gap-5 hover:bg-amber-50 transition-colors shadow-[4px_4px_0px_0px_#e7e4d8] group-hover/lib:shadow-[4px_4px_0px_0px_#d97706] group-hover/lib:border-amber-700"
+                            className="relative bg-white border-2 border-slate-800 p-3 md:p-4 pr-10 md:pr-12 flex items-center gap-3 md:gap-5 hover:bg-amber-50 transition-colors shadow-[4px_4px_0px_0px_#e7e4d8] group-hover/lib:shadow-[4px_4px_0px_0px_#d97706] group-hover/lib:border-amber-700"
                         >
                             <div className="absolute top-2 right-2 flex items-center gap-1">
                                 <span className="relative flex h-2 w-2">
@@ -478,12 +480,12 @@ const VideoList = () => {
                                 <span className="text-[8px] font-black text-amber-800/40 uppercase tracking-tighter">Live</span>
                             </div>
 
-                            <div className="bg-slate-900 p-2.5 text-white group-hover/lib:bg-amber-600 transition-colors">
-                                <BookOpen className="w-6 h-6" />
+                            <div className="bg-slate-900 p-2 text-white group-hover/lib:bg-amber-600 transition-colors">
+                                <BookOpen className="w-5 h-5 md:w-6 md:h-6" />
                             </div>
                             <div className="flex flex-col">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Module_01</span>
-                                <span className="text-lg font-black text-slate-900 uppercase italic leading-none group-hover/lib:text-amber-700 transition-colors">
+                                <span className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Module_01</span>
+                                <span className="text-md md:text-lg font-black text-slate-900 uppercase italic leading-none group-hover/lib:text-amber-700 transition-colors whitespace-nowrap">
                                     學習數據庫 <span className="inline-block group-hover/lib:translate-x-1 transition-transform">→</span>
                                 </span>
                             </div>
@@ -493,9 +495,9 @@ const VideoList = () => {
 
                 </div>
 
-                <div className="flex flex-wrap gap-4">
+                <div className="flex md:flex-wrap gap-4 w-full md:w-auto overflow-x-auto pb-4 md:pb-0 scrollbar-hide">
                     <StatBox label="已擷取單字" value={stats.mastered} subtext="本週 +12" color="emerald" icon={GraduationCap} />
-                    <Link to="/review">
+                    <Link to="/review" className="shrink-0">
                         <StatBox label="待複習項目" value={stats.reviews} subtext="需要練習" color="orange" icon={Dumbbell} />
                     </Link>
                 </div>
@@ -509,7 +511,7 @@ const VideoList = () => {
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 }}
-                className="relative bg-slate-800 rounded-px p-10 mb-12 overflow-hidden border-b-4 border-amber-600 shadow-2xl group"
+                className="relative bg-slate-800 rounded-px p-6 md:p-10 mb-8 md:mb-12 overflow-hidden border-b-4 border-amber-600 shadow-2xl group"
             >
                 {/* Background Decorations */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-amber-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-amber-600/20 transition-colors" />
@@ -529,22 +531,22 @@ const VideoList = () => {
                             <Sparkles className="w-5 h-5 text-amber-400" />
                             <span className="text-amber-400 text-sm font-black uppercase tracking-[0.3em]">AI 驅動的英文學習系統</span>
                         </motion.div>
-                        <h2 className="text-4xl md:text-5xl font-black text-white uppercase italic leading-[0.95] tracking-tighter mb-6">
+                        <h2 className="text-2xl md:text-5xl font-black text-white uppercase italic leading-[1.1] md:leading-[0.95] tracking-tighter mb-4 md:mb-6">
                             搜尋喜歡的影片<br />
                             <span className="text-amber-500">複製網址即可學習。</span>
                         </h2>
-                        <p className="text-slate-400 text-sm md:text-md leading-relaxed mb-8 max-w-md font-medium">
+                        <p className="text-slate-400 text-xs md:text-md leading-relaxed mb-6 md:mb-8 max-w-md font-medium">
                             只需從 YouTube 找出想看的英文影片，複製網址並點擊下方的「匯入新來源」，AI 將自動為您擷取核心單字與句型。
                         </p>
-                        <div className="flex gap-4">
+                        <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                             <button
                                 onClick={() => setIsModalOpen(true)}
-                                className="bg-amber-600 hover:bg-amber-500 text-white font-black uppercase tracking-widest text-xs px-8 py-4 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(217,119,6,0.3)] hover:shadow-[0_0_30px_rgba(217,119,6,0.5)] active:translate-y-0.5"
+                                className="w-full sm:w-auto bg-amber-600 hover:bg-amber-500 text-white font-black uppercase tracking-widest text-[10px] md:text-xs px-6 md:8 py-3 md:py-4 transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(217,119,6,0.3)] hover:shadow-[0_0_30px_rgba(217,119,6,0.5)] active:translate-y-0.5"
                             >
                                 <Plus className="w-4 h-4" />
                                 匯入新來源
                             </button>
-                            <Link to="/review" className="bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-xs px-8 py-4 transition-all border border-white/10 flex items-center gap-2">
+                            <Link to="/review" className="w-full sm:w-auto bg-white/5 hover:bg-white/10 text-white font-black uppercase tracking-widest text-[10px] md:text-xs px-6 md:8 py-3 md:py-4 transition-all border border-white/10 flex items-center justify-center gap-2">
                                 <Dumbbell className="w-4 h-4" />
                                 快速複習
                             </Link>
@@ -596,14 +598,14 @@ const VideoList = () => {
                         </button>
                     </div>
 
-                    <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide flex-1 px-2">
+                    <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide flex-1 px-2 w-full md:w-auto">
                         <button onClick={() => { setSelectedTag(null); setCurrentPage(1); }}
-                            className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border-2 transition-all ${!selectedTag ? 'bg-slate-800 text-white border-slate-800 shadow-lg' : 'bg-transparent text-slate-500 border-transparent hover:border-[#e7e4d8]'}`}>
+                            className={`px-3 md:px-4 py-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest border-2 transition-all whitespace-nowrap ${!selectedTag ? 'bg-slate-800 text-white border-slate-800 shadow-lg' : 'bg-transparent text-slate-500 border-transparent hover:border-[#e7e4d8]'}`}>
                             全部
                         </button>
                         {['Social', 'Work', 'Travel', 'Culture', 'Academic'].map(tag => (
                             <button key={tag} onClick={() => { setSelectedTag(tag); setCurrentPage(1); }}
-                                className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest border-2 transition-all whitespace-nowrap ${selectedTag === tag ? 'bg-slate-800 text-white border-slate-800 shadow-lg' : 'bg-transparent text-slate-500 border-transparent hover:border-[#e7e4d8]'}`}>
+                                className={`px-3 md:px-4 py-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest border-2 transition-all whitespace-nowrap ${selectedTag === tag ? 'bg-slate-800 text-white border-slate-800 shadow-lg' : 'bg-transparent text-slate-500 border-transparent hover:border-[#e7e4d8]'}`}>
                                 {tag}
                             </button>
                         ))}

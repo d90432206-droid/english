@@ -95,7 +95,7 @@ const MasteryLibrary = () => {
     }
 
     return (
-        <div className="min-h-screen bg-[#f3f1e9] text-slate-800 p-8 font-sans max-w-6xl mx-auto">
+        <div className="min-h-screen bg-[#f3f1e9] text-slate-800 p-4 md:p-8 font-sans max-w-6xl mx-auto">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
                 <div>
