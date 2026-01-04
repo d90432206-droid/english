@@ -437,40 +437,42 @@ const VideoList = () => {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-8 border-b-2 border-[#e7e4d8] pb-6"
             >
-                <div className="flex items-center gap-4 md:gap-10">
-                    <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        className="w-16 h-16 md:w-24 md:h-24 bg-white shadow-[4px_4px_0px_0px_#e7e4d8] md:shadow-[8px_8px_0px_0px_#e7e4d8] border-2 border-slate-800 p-2 flex items-center justify-center shrink-0"
-                    >
-                        <img src="/logo.svg" alt="VocaTube Logo" className="w-full h-full object-contain" />
-                    </motion.div>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 md:gap-10 w-full md:w-auto">
+                    <div className="flex items-center gap-4 md:gap-10">
+                        <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            className="w-16 h-16 md:w-24 md:h-24 bg-white shadow-[4px_4px_0px_0px_#e7e4d8] md:shadow-[8px_8px_0px_0px_#e7e4d8] border-2 border-slate-800 p-2 flex items-center justify-center shrink-0"
+                        >
+                            <img src="/logo.svg" alt="VocaTube Logo" className="w-full h-full object-contain" />
+                        </motion.div>
 
-                    <div className="flex flex-col">
-                        <div className="scale-75 md:scale-100 origin-left">
-                            <PuzzleLogo />
-                        </div>
-                        <div className="flex items-center gap-3 mt-3">
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-2 border-slate-800 px-2 py-0.5 bg-white shadow-[2px_2px_0px_0px_#e7e4d8]">
-                                V1.2.0_STABLE
-                            </span>
-
-                            {/* Login Trigger: Hidden in Metadata */}
-                            <button
-                                onClick={() => setIsLoginOpen(true)}
-                                className="flex items-center gap-1.5 px-2 py-0.5 hover:bg-slate-200 transition-colors group/login opacity-50 hover:opacity-100"
-                            >
-                                <div className={`w-1.5 h-1.5 rounded-full ${user ? 'bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.8)]' : 'bg-slate-400'}`}></div>
-                                <span className="text-[9px] font-mono font-bold text-slate-400 group-hover/login:text-slate-600 uppercase tracking-widest">
-                                    {user ? 'ADMIN' : 'GUEST'}
+                        <div className="flex flex-col">
+                            <div className="scale-75 md:scale-100 origin-left">
+                                <PuzzleLogo />
+                            </div>
+                            <div className="flex items-center gap-3 mt-3">
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] border-2 border-slate-800 px-2 py-0.5 bg-white shadow-[2px_2px_0px_0px_#e7e4d8]">
+                                    V1.2.0_STABLE
                                 </span>
-                            </button>
+
+                                {/* Login Trigger: Hidden in Metadata */}
+                                <button
+                                    onClick={() => setIsLoginOpen(true)}
+                                    className="flex items-center gap-1.5 px-2 py-0.5 hover:bg-slate-200 transition-colors group/login opacity-50 hover:opacity-100"
+                                >
+                                    <div className={`w-1.5 h-1.5 rounded-full ${user ? 'bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.8)]' : 'bg-slate-400'}`}></div>
+                                    <span className="text-[9px] font-mono font-bold text-slate-400 group-hover/login:text-slate-600 uppercase tracking-widest">
+                                        {user ? 'ADMIN' : 'GUEST'}
+                                    </span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <Link to="/library" className="group/lib ml-0 md:ml-4 w-full md:w-auto">
+                    <Link to="/library" className="group/lib w-full sm:w-auto">
                         <motion.div
                             whileHover={{ x: 5 }}
-                            className="relative bg-white border-2 border-slate-800 p-3 md:p-4 pr-10 md:pr-12 flex items-center gap-3 md:gap-5 hover:bg-amber-50 transition-colors shadow-[4px_4px_0px_0px_#e7e4d8] group-hover/lib:shadow-[4px_4px_0px_0px_#d97706] group-hover/lib:border-amber-700"
+                            className="relative bg-white border-2 border-slate-800 p-3 md:p-4 pr-10 md:pr-12 flex items-center gap-3 md:gap-5 hover:bg-amber-50 transition-colors shadow-[4px_4px_0px_0px_#e7e4d8] group-hover/lib:shadow-[4px_4px_0px_0px_#d97706] group-hover/lib:border-amber-700 w-full"
                         >
                             <div className="absolute top-2 right-2 flex items-center gap-1">
                                 <span className="relative flex h-2 w-2">
@@ -491,8 +493,6 @@ const VideoList = () => {
                             </div>
                         </motion.div>
                     </Link>
-
-
                 </div>
 
                 <div className="flex md:flex-wrap gap-4 w-full md:w-auto overflow-x-auto pb-4 md:pb-0 scrollbar-hide">

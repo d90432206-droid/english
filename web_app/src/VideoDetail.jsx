@@ -17,6 +17,8 @@ const VideoDetail = () => {
     const [currentCardIndex, setCurrentCardIndex] = useState(0)
     const [isFlipped, setIsFlipped] = useState(false)
     const [quizState, setQuizState] = useState({ selected: null, isCorrect: null })
+    const [sessionFinished, setSessionFinished] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
 
     useEffect(() => {
         if (activeTab === 'practice') {
@@ -24,6 +26,7 @@ const VideoDetail = () => {
             setIsFlipped(false)
             setPracticeMode('flashcard')
             setQuizState({ selected: null, isCorrect: null })
+            setSessionFinished(false)
         }
     }, [activeTab])
 
@@ -32,6 +35,8 @@ const VideoDetail = () => {
             setIsFlipped(false)
             setQuizState({ selected: null, isCorrect: null })
             setTimeout(() => setCurrentCardIndex(prev => prev + 1), 150)
+        } else {
+            setSessionFinished(true)
         }
     }
 
@@ -47,6 +52,9 @@ const VideoDetail = () => {
     // SRS Logic
     const updateSRS = async (e, quality) => {
         e.stopPropagation()
+        if (isSaving) return
+
+        setIsSaving(true)
         const word = video.vocabulary[currentCardIndex].word
         let interval = 1
         let status = 'learning'
@@ -70,9 +78,12 @@ const VideoDetail = () => {
                     next_review_date: nextDate.toISOString(),
                     last_reviewed_at: new Date().toISOString()
                 }, { onConflict: 'video_id, word' })
+
             handleNextCard()
         } catch (error) {
             console.error('Error updating SRS:', error)
+        } finally {
+            setIsSaving(false)
         }
     }
 
@@ -329,10 +340,29 @@ const VideoDetail = () => {
                                 </button>
                             </div>
 
-                            {practiceMode === 'flashcard' ? (
+                            {sessionFinished ? (
+                                <div className="w-full max-w-sm h-[380px] bg-[#fbf9f3] border-2 border-[#e7e4d8] flex flex-col items-center justify-center p-8 shadow-lg animate-in zoom-in duration-300">
+                                    <GraduationCap className="w-16 h-16 text-amber-600 mb-6 drop-shadow-lg" />
+                                    <h3 className="text-2xl font-black text-slate-800 text-center mb-2 uppercase italic">數據分析完成！</h3>
+                                    <p className="text-slate-500 text-base font-medium text-center mb-10 leading-relaxed">
+                                        本單元的單字量已全部練習完畢。<br />
+                                        <span className="text-xs uppercase tracking-widest text-slate-400 font-bold italic mt-2 block">Status: Optimized</span>
+                                    </p>
+                                    <button
+                                        onClick={() => {
+                                            setSessionFinished(false);
+                                            setCurrentCardIndex(0);
+                                            setIsFlipped(false);
+                                        }}
+                                        className="w-full py-4 bg-amber-700 hover:bg-amber-800 text-white font-bold uppercase tracking-widest shadow-lg shadow-amber-900/20 active:translate-y-0.5 transition-all"
+                                    >
+                                        重新開始練習
+                                    </button>
+                                </div>
+                            ) : practiceMode === 'flashcard' ? (
                                 <div
-                                    onClick={() => setIsFlipped(!isFlipped)}
-                                    className="relative w-full max-w-sm h-[380px] cursor-pointer group perspective-1000"
+                                    onClick={() => !isSaving && setIsFlipped(!isFlipped)}
+                                    className={`relative w-full max-w-sm h-[380px] cursor-pointer group perspective-1000 ${isSaving ? 'opacity-50 pointer-events-none' : ''}`}
                                 >
                                     <div className={`absolute inset-0 w-full h-full transition-all duration-500 preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}>
                                         {/* Front (Light) */}
@@ -381,11 +411,12 @@ const VideoDetail = () => {
                                                     ].map((btn, i) => (
                                                         <button
                                                             key={i}
+                                                            disabled={isSaving}
                                                             onClick={(e) => updateSRS(e, [0, 3, 4, 5][i])}
-                                                            className={`flex flex-col items-center justify-center p-2 rounded bg-slate-800 border border-slate-700 hover:bg-${btn.c}-900/30 hover:border-${btn.c}-500/50 hover:text-${btn.c}-400 transition-all active:scale-95`}
+                                                            className={`flex flex-col items-center justify-center p-2 rounded bg-slate-800 border border-slate-700 hover:bg-${btn.c}-900/30 hover:border-${btn.c}-500/50 hover:text-${btn.c}-400 transition-all active:scale-95 disabled:opacity-50`}
                                                         >
-                                                            <span className="text-[10px] font-bold">{btn.l}</span>
-                                                            <span className="text-[9px] opacity-50">{btn.t}</span>
+                                                            <span className="text-[10px] font-bold">{isSaving ? '...' : btn.l}</span>
+                                                            <span className="text-[8px] opacity-50">{btn.t}</span>
                                                         </button>
                                                     ))}
                                                 </div>
