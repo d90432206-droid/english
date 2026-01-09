@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from './supabaseClient'
 import { ArrowLeft, BookOpen, Quote, Calendar, GraduationCap, ChevronLeft, ChevronRight, RotateCcw, PlayCircle } from 'lucide-react'
@@ -138,13 +138,15 @@ const VideoDetail = () => {
         setQuizState({ selected: answer, isCorrect })
     }
 
-    const getQuizOptions = (correctWord) => {
+    const quizOptions = useMemo(() => {
+        if (!video || !video.vocabulary || !video.vocabulary[currentCardIndex]) return []
+        const correctWord = video.vocabulary[currentCardIndex].word
         const allWords = video.vocabulary.map(v => v.word)
         const distractors = allWords.filter(w => w !== correctWord)
             .sort(() => 0.5 - Math.random())
             .slice(0, 3)
         return [...distractors, correctWord].sort(() => 0.5 - Math.random())
-    }
+    }, [video, currentCardIndex])
 
     if (loading) return (
         <div className="flex justify-center items-center h-screen bg-[#f3f1e9]">
@@ -444,7 +446,7 @@ const VideoDetail = () => {
                                     </div>
 
                                     <div className="w-full grid grid-cols-1 gap-3">
-                                        {getQuizOptions(video.vocabulary[currentCardIndex].word).map((option, idx) => (
+                                        {quizOptions.map((option, idx) => (
                                             <button
                                                 key={idx}
                                                 onClick={() => handleQuizAnswer(option)}
