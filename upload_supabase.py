@@ -11,7 +11,7 @@ URL = os.getenv("SUPABASE_URL")
 KEY = os.getenv("SUPABASE_KEY")
 
 # Configuration
-TABLE_NAME = "english_videos" # <--- Change this if your table has a different name
+TABLE_NAME = "en_videos" # <--- Change this if your table has a different name
 
 def main():
     print(f"Connecting to Supabase ({URL})...")

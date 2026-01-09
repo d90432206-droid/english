@@ -1,7 +1,7 @@
 -- Create a table to track Spaced Repetition (SRS) progress
 -- Run this in your Supabase SQL Editor
 
-create table if not exists study_progress (
+create table if not exists en_study_progress (
   id uuid default gen_random_uuid() primary key,
   video_id text not null,
   word text not null,
@@ -21,7 +21,7 @@ create table if not exists study_progress (
 );
 
 -- Enable RLS (Optional, depending on your setup)
-alter table study_progress enable row level security;
+alter table en_study_progress enable row level security;
 
 -- Policy: Allow all access for now (since we use anon key for simple prototype)
-create policy "Allow generic access" on study_progress for all using (true) with check (true);
+create policy "Allow generic access" on en_study_progress for all using (true) with check (true);

@@ -69,7 +69,7 @@ const VideoDetail = () => {
 
         try {
             await supabase
-                .from('study_progress')
+                .from('en_study_progress')
                 .upsert({
                     video_id: video.video_id,
                     word: word,
@@ -109,7 +109,7 @@ const VideoDetail = () => {
     const fetchVideoDetail = async () => {
         try {
             const { data, error } = await supabase
-                .from('english_videos')
+                .from('en_videos')
                 .select('*')
                 .eq('video_id', id)
                 .single()
@@ -224,7 +224,7 @@ const VideoDetail = () => {
                                 }`}
                         >
                             <BookOpen className="w-3.5 h-3.5" />
-                            Vocabulary
+                            en_Vocabulary
                         </button>
                         <button
                             onClick={() => setActiveTab('sentence')}
@@ -234,7 +234,7 @@ const VideoDetail = () => {
                                 }`}
                         >
                             <Quote className="w-3.5 h-3.5" />
-                            Sentences
+                            en_Sentences
                         </button>
                         <button
                             onClick={() => setActiveTab('practice')}
@@ -244,7 +244,7 @@ const VideoDetail = () => {
                                 }`}
                         >
                             <GraduationCap className="w-3.5 h-3.5" />
-                            Practice
+                            en_Practice
                         </button>
                     </div>
 

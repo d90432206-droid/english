@@ -19,7 +19,7 @@ const ReviewSession = () => {
         try {
             setLoading(true)
             const { data: progressItems, error: progressError } = await supabase
-                .from('study_progress')
+                .from('en_study_progress')
                 .select('*')
                 .lte('next_review_date', new Date().toISOString())
                 .order('next_review_date', { ascending: true })
@@ -35,7 +35,7 @@ const ReviewSession = () => {
 
             const videoIds = [...new Set(progressItems.map(item => item.video_id))]
             const { data: videos, error: videosError } = await supabase
-                .from('english_videos')
+                .from('en_videos')
                 .select('video_id, vocabulary')
                 .in('video_id', videoIds)
 
@@ -78,7 +78,7 @@ const ReviewSession = () => {
 
         try {
             await supabase
-                .from('study_progress')
+                .from('en_study_progress')
                 .update({
                     status: status,
                     interval: interval,

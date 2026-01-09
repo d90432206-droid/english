@@ -285,13 +285,13 @@ const VideoList = () => {
         try {
             // 1. Fetch Mastered Vocab Count
             const { count: masteredCount } = await supabase
-                .from('study_progress')
+                .from('en_study_progress')
                 .select('*', { count: 'exact', head: true })
                 .eq('status', 'mastered')
 
             // 2. Fetch Active Reviews Count
             const { count: reviewCount } = await supabase
-                .from('study_progress')
+                .from('en_study_progress')
                 .select('*', { count: 'exact', head: true })
                 .lte('next_review_date', new Date().toISOString())
 
@@ -346,7 +346,7 @@ const VideoList = () => {
     const fetchVideos = async () => {
         try {
             const { data, error } = await supabase
-                .from('english_videos')
+                .from('en_videos')
                 .select('*')
                 .order('created_at', { ascending: false })
             if (error) throw error
@@ -377,7 +377,7 @@ const VideoList = () => {
         if (!confirm('Are you sure you want to remove this video and data?')) return
         try {
             const { error } = await supabase
-                .from('english_videos')
+                .from('en_videos')
                 .delete()
                 .eq('video_id', video_id)
             if (error) throw error
@@ -603,7 +603,7 @@ const VideoList = () => {
                             className={`px-3 md:px-4 py-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest border-2 transition-all whitespace-nowrap ${!selectedTag ? 'bg-slate-800 text-white border-slate-800 shadow-lg' : 'bg-transparent text-slate-500 border-transparent hover:border-[#e7e4d8]'}`}>
                             全部
                         </button>
-                        {['Social', 'Work', 'Travel', 'Culture', 'Academic'].map(tag => (
+                        {['en_Social', 'en_Work', 'en_Travel', 'en_Culture', 'en_Academic'].map(tag => (
                             <button key={tag} onClick={() => { setSelectedTag(tag); setCurrentPage(1); }}
                                 className={`px-3 md:px-4 py-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest border-2 transition-all whitespace-nowrap ${selectedTag === tag ? 'bg-slate-800 text-white border-slate-800 shadow-lg' : 'bg-transparent text-slate-500 border-transparent hover:border-[#e7e4d8]'}`}>
                                 {tag}

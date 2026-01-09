@@ -68,7 +68,7 @@ const AddVideoModal = ({ isOpen, onClose, onVideoAdded }) => {
         try {
             // 1. Check if already exists
             const { data: existing } = await supabase
-                .from('english_videos')
+                .from('en_videos')
                 .select('video_id, status')
                 .eq('video_id', preview.videoId)
                 .maybeSingle()
@@ -88,7 +88,7 @@ const AddVideoModal = ({ isOpen, onClose, onVideoAdded }) => {
             // or I should check schema. I will assume 'thumbnail' is safer or just omit if optional.
             // Let's try 'thumbnail' as field name.
             const { error: insertError } = await supabase
-                .from('english_videos')
+                .from('en_videos')
                 .insert([{
                     video_id: preview.videoId,
                     status: 'pending',

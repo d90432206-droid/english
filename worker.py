@@ -10,7 +10,7 @@ def process_queue(continuous=True):
     while True:
         try:
             # 1. Fetch one pending task
-            response = supabase.table('english_videos') \
+            response = supabase.table('en_videos') \
                 .select('*') \
                 .eq('status', 'pending') \
                 .limit(1) \
@@ -43,14 +43,14 @@ def process_queue(continuous=True):
             if title: update_data['title'] = title
             
             try:
-                supabase.table('english_videos') \
+                supabase.table('en_videos') \
                     .update(update_data) \
                     .eq('video_id', video_id) \
                     .execute()
             except Exception as update_err:
                 print(f"   ⚠️ Could not update initial metadata: {update_err}")
                 # Fallback: at least try to update status only
-                supabase.table('english_videos') \
+                supabase.table('en_videos') \
                     .update({'status': 'processing'}) \
                     .eq('video_id', video_id) \
                     .execute()
@@ -92,7 +92,7 @@ def process_queue(continuous=True):
             }
             
             try:
-                supabase.table('english_videos') \
+                supabase.table('en_videos') \
                     .update(update_payload) \
                     .eq('video_id', video_id) \
                     .execute()
@@ -100,7 +100,7 @@ def process_queue(continuous=True):
                 print(f"   ⚠️ Final update failed (possibly missing columns): {final_err}")
                 # Fallback: update status and analysis data even if title/thumbnail fail
                 # Assuming category/vocabulary/sentence_patterns ALWAYS exist
-                supabase.table('english_videos') \
+                supabase.table('en_videos') \
                     .update({
                         'status': 'completed',
                         'category': update_payload['category'],
@@ -119,7 +119,7 @@ def process_queue(continuous=True):
             # Update DB with error
             try:
                 if 'video_id' in locals():
-                    supabase.table('english_videos') \
+                    supabase.table('en_videos') \
                         .update({
                             'status': 'error', 
                             'processing_error': str(e)

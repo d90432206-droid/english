@@ -22,14 +22,14 @@ const MasteryLibrary = () => {
 
             // Fetch all videos for vocab and sentences
             const { data: videos, error: videosError } = await supabase
-                .from('english_videos')
+                .from('en_videos')
                 .select('video_id, title, vocabulary, sentence_patterns')
 
             if (videosError) throw videosError
 
             // Fetch all study progress
             const { data: progress, error: progressError } = await supabase
-                .from('study_progress')
+                .from('en_study_progress')
                 .select('*')
 
             if (progressError) throw progressError
@@ -112,13 +112,13 @@ const MasteryLibrary = () => {
                         onClick={() => setActiveTab('vocab')}
                         className={`flex-1 md:flex-none px-6 py-2 text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'vocab' ? 'bg-[#fbf9f3] text-amber-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                     >
-                        單字庫 ({vocabList.length})
+                        en_單字庫 ({vocabList.length})
                     </button>
                     <button
                         onClick={() => setActiveTab('sentence')}
                         className={`flex-1 md:flex-none px-6 py-2 text-xs font-black uppercase tracking-widest transition-all ${activeTab === 'sentence' ? 'bg-[#fbf9f3] text-amber-700 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                     >
-                        句型庫 ({sentenceList.length})
+                        en_句型庫 ({sentenceList.length})
                     </button>
                 </div>
             </div>

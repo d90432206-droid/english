@@ -352,7 +352,7 @@ def main():
                     # Upload to Supabase immediately
                     try:
                         print(f"   [上傳] 正在寫入資料庫...")
-                        supabase.table('english_videos').upsert(analysis).execute()
+                        supabase.table('en_videos').upsert(analysis).execute()
                         print("   ✅ 資料庫更新成功！")
                     except Exception as db_err:
                         print(f"   ⚠️ 資料庫寫入失敗 (但已存入 JSON): {db_err}")
