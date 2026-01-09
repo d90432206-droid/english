@@ -449,9 +449,9 @@ const VideoDetail = () => {
                                                 key={idx}
                                                 onClick={() => handleQuizAnswer(option)}
                                                 disabled={quizState.selected !== null}
-                                                className={`w-full p-4 font-bold text-sm border-2 transition-all ${quizState.selected === option
+                                                className={`w-full p-4 font-bold text-sm border-2 transition-all duration-200 ${quizState.selected === option
                                                     ? (quizState.isCorrect ? 'bg-emerald-100 border-emerald-500 text-emerald-700' : 'bg-red-100 border-red-500 text-red-700 shadow-inner')
-                                                    : (quizState.selected && option === video.vocabulary[currentCardIndex].word ? 'bg-emerald-50 border-emerald-500 text-emerald-600' : 'bg-white border-[#e7e4d8] text-slate-600 hover:border-amber-400')
+                                                    : (quizState.selected && option === video.vocabulary[currentCardIndex].word ? 'bg-emerald-50 border-emerald-500 text-emerald-600' : 'bg-white border-transparent text-slate-600 hover:border-amber-400')
                                                     }`}
                                             >
                                                 {option}
