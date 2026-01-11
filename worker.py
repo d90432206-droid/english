@@ -2,19 +2,42 @@ import time
 import traceback
 import json
 import sys
+from datetime import datetime, timedelta
 from study_ai import fetch_transcript_final, analyze_with_ai, rotate_key, supabase
+
+# Maximum time to run (e.g., 50 minutes to fit in an hourly cron)
+MAX_RUNTIME_SECONDS = 50 * 60 
+START_TIME = datetime.now()
+
+def is_time_up():
+    elapsed = (datetime.now() - START_TIME).total_seconds()
+    return elapsed > MAX_RUNTIME_SECONDS
 
 def process_queue(continuous=True):
     print(f"🚀 Video Processing Worker Started... Mode: {'Continuous' if continuous else 'Batch (One-off)'}")
+    print(f"⏱️ Runtime Limit: {MAX_RUNTIME_SECONDS/60:.1f} minutes")
+    
+    attempted_ids = set() # Prevent infinite loop on same video in one run
     
     while True:
+        # Check if we should exit due to time limit
+        if not continuous and is_time_up():
+            print(f"⏰ [Timeout] Reached {MAX_RUNTIME_SECONDS/60:.1f} minutes limit. Exiting gracefully.")
+            break
+
         try:
             # 1. Fetch one pending task
-            response = supabase.table('en_videos') \
+            query = supabase.table('en_videos') \
                 .select('*') \
-                .eq('status', 'pending') \
-                .limit(1) \
-                .execute()
+                .eq('status', 'pending')
+            
+            # If we already tried some in this run and they failed, skip them
+            if attempted_ids:
+                # PostgREST doesn't have a clean 'NOT IN', but we can filter or just pick one
+                # and skip if it's in attempted_ids.
+                pass
+
+            response = query.limit(1).execute()
                 
             tasks = response.data
             
@@ -22,22 +45,47 @@ def process_queue(continuous=True):
                 if not continuous:
                     print("✅ [Batch Mode] Queue is empty. Exiting.")
                     break
-                time.sleep(2) # No tasks, wait less
+                time.sleep(10) # No tasks, wait longer in continuous mode
                 continue
                 
             task = tasks[0]
-            video_id = task['video_id']
-            url = f"https://www.youtube.com/watch?v={video_id}"
-            print(f"\nProcessing Task: {video_id}")
+            video_id = task.get('video_id')
             
-            # 2. Mark as processing and try to fetch Title immediately for better UX
+            if not video_id:
+                print("⚠️ Found task with missing video_id. Skipping.")
+                continue
+
+            if video_id in attempted_ids:
+                print(f"⚠️ Video {video_id} already attempted and failed in this run. Skipping to avoid loop.")
+                # We need to manually change its status to 'error' or something if it's still pending
+                # but if we are here, it means the previous attempt failed to update status.
+                # Let's try to fetch another one by using a longer tail or just breaking
+                print("   (Queue might be stuck on this item. Suggest manual intervention.)")
+                time.sleep(5)
+                # To actually skip it in the query, we'd need better filtering. 
+                # For now, let's just abort this run to avoid 6h hang.
+                break
+
+            attempted_ids.add(video_id)
+            url = f"https://www.youtube.com/watch?v={video_id}"
+            print(f"\n[{datetime.now().strftime('%H:%M:%S')}] Processing Task: {video_id}")
+            
+            # 2. Mark as processing and try to fetch Title immediately
             title = None
             try:
                 import yt_dlp
-                with yt_dlp.YoutubeDL({'quiet': True, 'no_warnings': True}) as ydl:
+                # Add a socket timeout for yt-dlp
+                ydl_opts = {
+                    'quiet': True, 
+                    'no_warnings': True,
+                    'socket_timeout': 30, # 30 seconds timeout
+                    'nocheckcertificate': True
+                }
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     info = ydl.extract_info(url, download=False)
                     title = info.get('title')
-            except: pass
+            except Exception as e_yt:
+                print(f"   ℹ️ yt-dlp metadata skip: {e_yt}")
 
             update_data = {'status': 'processing'}
             if title: update_data['title'] = title
