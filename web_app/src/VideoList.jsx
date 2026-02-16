@@ -645,12 +645,39 @@ const VideoList = () => {
                                     </div>
                                 )}
                                 <div className="absolute top-0 right-0 p-2 flex gap-2 z-50">
+                                    {video.status !== 'completed' && (
+                                        <button
+                                            onClick={async (e) => {
+                                                e.stopPropagation();
+                                                try {
+                                                    const { error } = await supabase
+                                                        .from('en_videos')
+                                                        .update({ status: 'pending', processing_error: null })
+                                                        .eq('video_id', video.video_id);
+                                                    if (error) throw error;
+                                                    fetchVideos();
+                                                } catch (err) {
+                                                    alert('重試失敗: ' + err.message);
+                                                }
+                                            }}
+                                            className="bg-amber-600 hover:bg-amber-700 text-white px-2 py-1 shadow-lg backdrop-blur-sm transition-all hover:scale-105 flex items-center gap-1 rounded-sm"
+                                            title="重試解析"
+                                        >
+                                            <Sparkles className="w-3 h-3" />
+                                            <span className="text-[8px] font-black tracking-tighter">RETRY</span>
+                                        </button>
+                                    )}
                                     <button onClick={(e) => handleDelete(e, video.video_id)} className="bg-red-500/80 hover:bg-red-600 text-white p-1.5 shadow-md backdrop-blur-sm transition-all hover:scale-110">
                                         <Trash2 className="w-3.5 h-3.5" />
                                     </button>
                                 </div>
                                 <div className="absolute bottom-0 left-0 w-full h-1 bg-slate-200">
-                                    <div className={`h-full bg-amber-600 transition-all duration-1000 ${video.status === 'completed' ? 'w-full' : video.status === 'processing' ? 'w-2/3 animate-pulse' : 'w-1/3'}`}></div>
+                                    <div className={`h-full transition-all duration-1000 ${
+                                        video.status === 'completed' ? 'w-full bg-emerald-500' : 
+                                        video.status === 'error' ? 'w-full bg-red-500' : 
+                                        video.status === 'processing' ? 'w-2/3 bg-amber-600 animate-pulse' : 
+                                        'w-1/3 bg-slate-400'
+                                    }`}></div>
                                 </div>
                             </div>
 
@@ -665,7 +692,9 @@ const VideoList = () => {
                                 </div>
 
                                 <h3 className={`font-black text-slate-800 leading-tight mb-4 uppercase italic truncate group-hover:text-amber-700 transition-colors ${viewMode === 'list' ? 'text-md' : 'text-lg line-clamp-2'}`}>
-                                    {video.status === 'completed' ? (video.title || `數據單元_${video.video_id}`) : (video.status === 'processing' ? '正在處理數據...' : '排隊中...')}
+                                    {video.status === 'completed' ? (video.title || `數據單元_${video.video_id}`) : 
+                                     video.status === 'processing' ? '正在處理數據...' : 
+                                     video.status === 'error' ? '❌ 解析失敗 (點擊重試)' : '排隊中...'}
                                 </h3>
 
                                 <div className="flex flex-wrap gap-1.5 opacity-60 group-hover:opacity-100 transition-opacity">

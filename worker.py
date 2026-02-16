@@ -104,7 +104,13 @@ def process_queue(continuous=True):
                     .execute()
                 
             # 3. Fetch Transcript
-            transcript = fetch_transcript_final(video_id)
+            try:
+                transcript = fetch_transcript_final(video_id)
+            except Exception as e_cc:
+                if "429" in str(e_cc):
+                    print("   🛑 YouTube IP 遭封鎖 (429)，暫停 60 秒...")
+                    time.sleep(60)
+                raise e_cc
             
             if not transcript:
                 raise Exception("Failed to fetch transcript (No CC found)")
@@ -119,10 +125,10 @@ def process_queue(continuous=True):
                     break
                 except Exception as ai_err:
                     err_str = str(ai_err)
-                    if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
-                        print("   [429] Rotating Key...")
+                    if any(code in err_str for code in ["429", "RESOURCE_EXHAUSTED", "503", "UNAVAILABLE"]):
+                        print(f"   [{'429' if '429' in err_str else '503'}] Temporary error, rotating Key and retrying...")
                         rotate_key()
-                        time.sleep(2)
+                        time.sleep(5 if "503" in err_str or "UNAVAILABLE" in err_str else 2)
                     else:
                         raise ai_err # Re-raise other errors
             

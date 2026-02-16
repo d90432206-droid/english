@@ -1,4 +1,4 @@
-import pandas as pd
+# import pandas as pd
 import yt_dlp
 import re
 import glob
@@ -175,46 +175,21 @@ def fetch_transcript_final(video_id):
     """
     # 1. Try youtube_transcript_api
     try:
-        print("   [嘗試] 使用 youtube_transcript_api (Deep Debug)...")
-        import youtube_transcript_api
-        print(f"   [DEBUG] YTA Module File: {getattr(youtube_transcript_api, '__file__', 'Unknown')}")
+        from youtube_transcript_api import YouTubeTranscriptApi
         
-        # Access the class carefully
-        YTA_Class = getattr(youtube_transcript_api, 'YouTubeTranscriptApi', None)
-        if not YTA_Class:
-            print("   [DEBUG] YouTubeTranscriptApi class not found in module!")
-            # Fallback level 2: try direct import
-            from youtube_transcript_api import YouTubeTranscriptApi as YTA_Class
+        print(f"   [嘗試] 使用 YouTubeTranscriptApi...")
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
         
-        print(f"   [DEBUG] YTA Class: {YTA_Class}")
-        print(f"   [DEBUG] YTA Methods: {[m for m in dir(YTA_Class) if not m.startswith('_')]}")
-
-        raw_data = None
-        
-        # Strategy A: list_transcripts
+        # 優先順序：手動英文 -> 自動英文 -> 第一個可用的
         try:
-            if hasattr(YTA_Class, 'list_transcripts'):
-                transcript_list = YTA_Class.list_transcripts(video_id)
-                try:
-                    transcript = transcript_list.find_transcript(['en', 'en-US', 'en-GB'])
-                except:
-                    try:
-                        transcript = transcript_list.find_generated_transcript(['en'])
-                    except:
-                        transcript = next(iter(transcript_list))
-                raw_data = transcript.fetch()
-            else:
-                raise AttributeError("Method 'list_transcripts' missing")
-        except Exception as e_list:
-             print(f"    -> list_transcripts failed: {str(e_list)[:100]}")
-             # Strategy B: get_transcript
-             if hasattr(YTA_Class, 'get_transcript'):
-                 print("    -> Trying get_transcript...")
-                 raw_data = YTA_Class.get_transcript(video_id, languages=['en', 'en-US', 'en-GB'])
-             else:
-                 print("    -> get_transcript also missing!")
-                 raise Exception("No usable methods found in YTA Class")
-
+            transcript = transcript_list.find_transcript(['en', 'en-US', 'en-GB'])
+        except:
+            try:
+                transcript = transcript_list.find_generated_transcript(['en', 'en-US'])
+            except:
+                transcript = next(iter(transcript_list))
+        
+        raw_data = transcript.fetch()
         if raw_data:
             full_text = ""
             for p in raw_data:
@@ -226,10 +201,15 @@ def fetch_transcript_final(video_id):
             return full_text
 
     except Exception as e:
-        print(f"   [失敗] YTA 失敗: {str(e)[:150]}... 改用 yt-dlp")
+        err_msg = str(e)
+        print(f"   [資訊] YTA 無法取得字幕: {err_msg[:100]}")
+        if "429" in err_msg:
+            print("   ⚠️ YouTube 正在限制您的 IP (429 Too Many Requests)")
+            # If 429, we skip to yt-dlp but it might also fail.
         
     # 2. Fallback to yt-dlp
     try:
+        print("   [嘗試] 使用 yt-dlp 下載字幕...")
         url = f"https://www.youtube.com/watch?v={video_id}"
         temp_filename = f"temp_{video_id}"
         
@@ -242,10 +222,11 @@ def fetch_transcript_final(video_id):
             'skip_download': True,
             'writesubtitles': True,
             'writeautomaticsub': True,
-            'subtitleslangs': ['en.*', 'en'], 
+            'subtitleslangs': ['en.*', 'en', 'en-US'], 
             'outtmpl': temp_filename,
             'quiet': True,
             'no_warnings': True,
+            'nocheckcertificate': True,
         }
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -257,8 +238,6 @@ def fetch_transcript_final(video_id):
             return None
             
         target_file = possible_files[0]
-        # Prefer non-auto if available? Just pick first for now.
-        
         with open(target_file, 'r', encoding='utf-8') as f:
             vtt_content = f.read()
             
@@ -272,6 +251,8 @@ def fetch_transcript_final(video_id):
         
     except Exception as e:
         print(f"   [失敗] yt-dlp 失敗: {str(e)}")
+        if "429" in str(e):
+            raise Exception("YouTube IP Blocked (429)")
         return None
 
 def analyze_with_ai(text_with_timestamps):
@@ -327,10 +308,16 @@ def main():
         print("❌ 錯誤: 請先在程式碼第 18 行填入至少一組有效的 Google API Key")
         return
 
+    import csv
     if not os.path.exists('links.csv'): return
-    df = pd.read_csv('links.csv')
-    urls = df.iloc[:, 0].tolist()
-    if "http" in str(df.columns[0]): urls.insert(0, df.columns[0])
+    
+    urls = []
+    with open('links.csv', 'r', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if row:
+                urls.append(row[0])
+
 
     results = []
     print(f"🚀 生產線啟動，預計處理 {len(urls)} 個連結...")
@@ -365,10 +352,10 @@ def main():
                     
                 except Exception as e:
                     error_str = str(e)
-                    if "429" in error_str or "RESOURCE_EXHAUSTED" in error_str:
-                        print(f" ⚠️ 額度用盡 (429)，自動切換下一組 API Key...")
+                    if any(code in error_str for code in ["429", "RESOURCE_EXHAUSTED", "503", "UNAVAILABLE"]):
+                        print(f" ⚠️ 臨時錯誤 ({'429' if '429' in error_str else '503'})，自動切換下一組 API Key 並稍後重試...")
                         rotate_key()
-                        time.sleep(2) # Brief pause before retry with new key
+                        time.sleep(5 if "503" in error_str or "UNAVAILABLE" in error_str else 2)
                     else:
                         print(f" ❌ AI分析出錯: {e}")
                         break # Other errors, don't retry
