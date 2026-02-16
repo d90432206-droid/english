@@ -259,14 +259,29 @@ def analyze_with_ai(text_with_timestamps):
     # 1. 定義您的標準標籤庫 (Standard Tag Library)
     tags_list = ["社交 (Social)", "職場 (Work)", "旅遊 (Travel)", "生活 (Daily)", "文化 (Culture)", "學術 (Academic)"]
 
+    # 2. 根據逐字稿長度動態調整擷取數量
+    text_len = len(text_with_timestamps)
+    # 預設值 (適用於 5-10 分鐘影片)
+    vocab_count = "12-15"
+    pattern_count = "6-8"
+    
+    if text_len > 30000: # 約 25-30 分鐘以上
+        vocab_count = "25-30"
+        pattern_count = "12-15"
+    elif text_len > 15000: # 約 10-15 分鐘
+        vocab_count = "18-22"
+        pattern_count = "8-10"
+
+    print(f"   [AI] 逐字稿長度: {text_len} 字元，預計擷取 {vocab_count} 個單字 與 {pattern_count} 個句型")
+
     prompt = f"""
     你是一個專業的英文老師。我會提供一段影片逐字稿，格式為「秒數|英文內容」。
     
     請分析並執行以下任務：
     1. 從這份標籤清單中 {tags_list}，挑選出 1~2 個最符合本影片的情境標籤。
-    2. 整理出 8-10 個核心單字。篩選基準為「實用頻率高」且「適合學習者擴充詞彙」的字，
+    2. 整理出 {vocab_count} 個核心單字。篩選基準為「實用頻率高」且「適合學習者擴充詞彙」的字，
        請參考 Oxford 3000 或 CEFR B1-B2 等級，優先選擇能展現該影片主題特色的單字。
-    3. 整理出 5-6 個常用句型。優先選擇日常對話中高頻出現、結構完整且具備變換能力的組合，
+    3. 整理出 {pattern_count} 個常用句型。優先選擇日常對話中高頻出現、結構完整且具備變換能力的組合，
        並找出該句型在影片中出現的**準確時間點 (timestamp)**。
     4. **解析與翻譯**：單字解釋需精簡，所有解釋與例句必須包含繁體中文翻譯。
     5. **分佈平均**：請確保挑選的單字與句型在整段影片中分佈相對均勻，而非集中在開頭。
@@ -294,8 +309,8 @@ def analyze_with_ai(text_with_timestamps):
       ]
     }}
     
-    逐字稿內容 (前 6000 字)：
-    {text_with_timestamps[:6000]}
+    逐字稿內容 (最多提供 50000 字元以完整分析長影片)：
+    {text_with_timestamps[:50000]}
     """
     response = client.models.generate_content(model=MODEL_NAME, contents=prompt)
     raw_text = response.text.replace('```json', '').replace('```', '').strip()
